@@ -1,0 +1,16 @@
+[
+  {
+    "title": "Another Book",
+    "imageUrl": "https://www.publicdomainpictures.net/pictures/10000/velka/1-1210009435EGmE.jpg",
+    "description": "This book is awesome",
+    "price": "19.99",
+    "id": "0.7038527822539624"
+  },
+  {
+    "id": "0.6832328678148589",
+    "title": "Learn Nodejs",
+    "imageUrl": "https://www.publicdomainpictures.net/pictures/10000/velka/1-1210009435EGmE.jpg",
+    "description": "Build web application with nodejs",
+    "price": "16.99"
+  }
+]

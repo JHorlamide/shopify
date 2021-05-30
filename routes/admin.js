@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
-
-const adminController = require('../controllers/admin');
+const isAuth = require('../middleware/auth');
 
 /* Controllers */
 const {
@@ -11,7 +10,7 @@ const {
   getEditProduct,
   postEditProduct,
   deleteProduct,
-  createUser
+  createUser,
 } = require('../controllers/admin');
 
 /***
@@ -19,45 +18,41 @@ const {
  * @desc    Renders view to creating new product
  * @access  Private
  * ***/
-router.get('/add-product', getAddProduct);
+router.get('/add-product', isAuth, getAddProduct);
 
 /***
  * @router  GET: /admin/products
  * @desc    Returns all products to the admin
  * @access  Private
  * ***/
-router.get('/products', getProducts);
+router.get('/products', isAuth, getProducts);
 
 /***
  * @router  POST: /admin/add-product
  * @desc    Create new product
  * @access  Private
  * ***/
-router.post('/add-product', postAddProduct);
+router.post('/add-product', isAuth, postAddProduct);
 
 /***
  * @router  GET: /admin/edit-product/:productId
  * @desc    Edit product
  * @access  Private
  * ***/
-router.get('/edit-product/:productId', getEditProduct);
+router.get('/edit-product/:productId', isAuth, getEditProduct);
 
 /***
  * @router  POST: /admin/edit-product
  * @desc    Save edited product
  * @access  Private
  * ***/
-router.post('/edit-product', postEditProduct);
+router.post('/edit-product', isAuth, postEditProduct);
 
 /***
  * @router  POST: /admin/delete-product
  * @desc    Delete product
  * @access  Private
  * ***/
-router.post('/delete-product', deleteProduct);
-
-
-/* create user */
-router.post('/user', createUser); 
+router.post('/delete-product', isAuth, deleteProduct);
 
 module.exports = router;

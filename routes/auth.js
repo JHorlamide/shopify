@@ -9,7 +9,6 @@ const {
   postLogout,
 } = require('../controllers/auth');
 
-
 /***
  * @router  GET: /auth/signup
  * @desc    Render view for signing up

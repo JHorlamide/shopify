@@ -1,8 +1,12 @@
 const { User } = require('../models/mongodb models/User');
 
 const userMiddleware = async (req, res, next) => {
+  if(!req.session.user) {
+    return next();
+  }
+
   try {
-    const user = await User.findById('60ad2b7064de4e12580e413a');
+    const user = await User.findById(req.session.user._id);
     req.user = user;
     next();
   } catch (error) {

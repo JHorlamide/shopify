@@ -14,17 +14,6 @@ routes(app);
 /* Database connection */
 connectDB();
 
-const createUser = async () => {
-  const user = new User({
-    name: 'JHorlamide',
-    email: 'olamide_jubril@outlook.com',
-    cart: { items: [] },
-  });
-
-  await user.save()
-};
-
-// createUser()
 
 app.listen(PORT, () => {
   console.log(`Server started on port ${PORT}...`);

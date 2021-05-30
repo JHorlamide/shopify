@@ -8,18 +8,21 @@
 
   <main>
     <form class="login-form" action="/auth/login" method="POST">
+      <!-- CSRF -->
+      <input type="hidden" name='_csrf' value="<%= csrfToken %> ">
+      
       <!-- Email -->
       <div class="form-control">
         <label for="email">Email</label>
         <input type="email" name="email" id="email">
       </div>
-
+      
       <!-- Password -->
       <div class="form-control">
         <label for="password">Password</label>
         <input type="password" name="password" id="password">
       </div>
-
+      
       <!-- Button -->
       <button class="btn" type="submit">Login</button>
     </form>

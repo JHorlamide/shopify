@@ -125,8 +125,5 @@ const validation = (userInput) => {
 
 const User = mongoose.model('User', userSchema);
 
-// module.exports = User;
-// exports.validation = validation;
-
 exports.validation = validation;
 exports.User = User;

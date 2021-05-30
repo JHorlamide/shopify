@@ -10,7 +10,6 @@ exports.getAddProduct = asyncMiddleware(async (req, res) => {
   res.render('admin/add-product', {
     pageTitle: 'Add Product',
     path: '/admin/add-product',
-    isAuthenticated: req.session.isLoggedIn,
   });
 });
 
@@ -40,7 +39,6 @@ exports.getProducts = asyncMiddleware(async (req, res) => {
     pageTitle: 'Admin Products',
     path: '/admin/products',
     editing: false,
-    isAuthenticated: req.session.isLoggedIn,
   });
 });
 
@@ -57,7 +55,6 @@ exports.getEditProduct = asyncMiddleware(async (req, res) => {
     path: 'admin/edit-product',
     editing: editMode,
     product: product,
-    isAuthenticated: req.session.isLoggedIn,
   });
 });
 
@@ -97,13 +94,4 @@ exports.deleteProduct = asyncMiddleware(async (req, res) => {
 
   await Product.findByIdAndRemove(req.body.productId);
   res.redirect('/admin/products');
-});
-
-exports.createUser = asyncMiddleware(async (req, res) => {
-  const { name, email, cart } = req.body;
-
-  const user = new User({ name, email, cart });
-  await user.save();
-
-  res.json(user);
 });

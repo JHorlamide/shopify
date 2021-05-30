@@ -9,7 +9,6 @@ exports.getProducts = asyncMiddleware(async (req, res) => {
     prods: products,
     pageTitle: 'All Products',
     path: '/products',
-    isAuthenticated: req.session.isLoggedIn,
   });
 });
 
@@ -21,7 +20,6 @@ exports.getProduct = asyncMiddleware(async (req, res) => {
     product: product,
     pageTitle: product.tle,
     path: '/products',
-    isAuthenticated: req.session.isLoggedIn,
   });
 });
 
@@ -33,7 +31,6 @@ exports.getIndex = asyncMiddleware(async (req, res) => {
     prods: products,
     pageTitle: 'Shop',
     path: '/',
-    isAuthenticated: req.session.isLoggedIn,
   });
 });
 
@@ -48,7 +45,6 @@ exports.getCart = asyncMiddleware(async (req, res) => {
     path: '/cart',
     pageTitle: 'Your Cart',
     products: products,
-    isAuthenticated: req.session.isLoggedIn,
   });
 });
 
@@ -105,7 +101,6 @@ exports.getOrders = asyncMiddleware(async (req, res) => {
     path: '/orders',
     pageTitle: 'Your Orders',
     orders: orders,
-    isAuthenticated: req.session.isLoggedIn,
   });
 });
 
@@ -114,6 +109,5 @@ exports.getCheckout = asyncMiddleware(async (req, res) => {
   res.render('shop/checkout', {
     path: '/checkout',
     pageTitle: 'Checkout',
-    isAuthenticated: req.session.isLoggedIn,
   });
 });

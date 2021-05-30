@@ -17,7 +17,6 @@ exports.getSignUp = asyncMiddleware(async (req, res) => {
   res.render('auth/signup', {
     path: '/signup',
     pageTitle: 'Signup',
-    isAuthenticated: false,
   });
 });
 
@@ -58,7 +57,6 @@ exports.getLogin = asyncMiddleware(async (req, res) => {
   res.render('auth/login', {
     path: '/login',
     pageTitle: 'Login',
-    isAuthenticated: req.session.isLoggedIn,
   });
 });
 
@@ -84,7 +82,6 @@ exports.postLogin = asyncMiddleware(async (req, res) => {
     return res.status(400).redirect('/auth/login');
   }
 
-  const token = user.generateAuthToken();
   req.session.isLoggedIn = true;
   req.session.user = user;
   req.session.save((err) => {
@@ -95,6 +92,8 @@ exports.postLogin = asyncMiddleware(async (req, res) => {
     res.redirect('/');
   });
 
+  const token = user.generateAuthToken();
+
   console.log(token);
 });
 
@@ -104,6 +103,7 @@ exports.postLogout = asyncMiddleware(async (req, res) => {
     if (err) {
       return console.log(err);
     }
+
     res.redirect('/');
   });
 });

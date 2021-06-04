@@ -39,6 +39,7 @@
                     <form action="/auth/logout" method="POST">
                         <!-- CSRF -->
                         <input type="hidden" name='_csrf' value="<%= csrfToken %> ">
+                        
                         <button type="submit">Logout</button>
                     </form>
                 </li>
@@ -83,6 +84,7 @@
                 <form action="/auth/logout" method="POST">
                     <!-- CSRF -->
                     <input type="hidden" name='_csrf' value="<%= csrfToken %> ">
+
                     <button type="submit">Logout</button>
                 </form>
             </li>

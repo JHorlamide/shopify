@@ -1,8 +1,8 @@
 const express = require('express');
-const session = require('express-session');
 const path = require('path');
-const config = require('config');
 const csrf = require('csurf');
+const config = require('config');
+const session = require('express-session');
 const mongodbStore = require('connect-mongodb-session')(session);
 
 /* Routes */
@@ -12,35 +12,56 @@ const authRoute = require('../routes/auth');
 
 /* Middlewares */
 const userMiddleware = require('../middleware/userMiddleware');
+
+/* Error handling controller */
 const errorController = require('../controllers/error');
 
-/* Session store config */
-const store = new mongodbStore({
-  uri: config.get('MONGODB_URI'),
-  collection: 'sessions',
-});
-
-/* CSRF Protection */
-const csrfProtection = csrf({ cookie: false });
-
 const routes = (app) => {
+  /* Session store config */
+  const store = new mongodbStore({
+    uri: config.get('MONGODB_URI'),
+    collection: 'sessions',
+  });
+
   /* Set view engin */
   app.set('view engine', 'ejs');
   app.set('views', 'views');
 
-  app.use(express.urlencoded({ extended: false }));
   app.use(express.static(path.join(__dirname, '../public')));
+  app.use(express.urlencoded({ extended: true }));
+
   app.use(
     session({
-      secret: 'mySecrete',
+      secret: 'secret123',
       resave: false,
       store: store,
       saveUninitialized: false,
+      cookie: {
+        httpOnly: true,
+        maxAge: 360000,
+      },
     })
   );
 
-  app.use(csrfProtection);
-  app.use(userMiddleware);
+  /* CSRF Protection */
+  app.use(csrf());
+
+  /* User middleware */ 
+  app.use(async (req, res, next) => {
+    if (!req.session.user) {
+      return next();
+    }
+
+    try {
+      const user = await User.findById(req.session.user._id);
+      req.user = user;
+      next();
+    } catch (error) {
+      console.log(error);
+    }
+  });
+
+  /* Local variables */ 
   app.use((req, res, next) => {
     res.locals.isAuthenticated = req.session.isLoggedIn;
     res.locals.csrfToken = req.csrfToken();

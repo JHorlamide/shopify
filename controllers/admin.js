@@ -31,13 +31,21 @@ exports.postAddProduct = asyncMiddleware(async (req, res) => {
 
 /* Get all products */
 exports.getProducts = asyncMiddleware(async (req, res) => {
-  const products = await Product.find();
+  let message = req.flash('error');
+  if (message.length > 0) {
+    message = message;
+  } else {
+    message = null;
+  }
+
+  const products = await Product.find({ userId: req.user._id });
 
   res.render('admin/products', {
     prods: products,
     pageTitle: 'Admin Products',
     path: '/admin/products',
     editing: false,
+    errorMessage: message,
   });
 });
 
@@ -73,6 +81,12 @@ exports.postEditProduct = asyncMiddleware(async (req, res) => {
   /* Check if product exist */
   if (!product) {
     return res.status(404).json({ msg: 'No Product Found' });
+  }
+
+  /* Check if product belongs to logged in user */
+  if (product.userId.toString() !== req.user._id.toString()) {
+    req.flash('error', 'You not authorized to edit this product');
+    return res.status(401).redirect('/admin/products');
   }
 
   /* Update and save product */

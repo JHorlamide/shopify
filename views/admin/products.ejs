@@ -6,6 +6,10 @@
     <%- include('../includes/navigation.ejs') %>
 
     <main>
+        <% if (errorMessage) { %>
+            <div class="user-message user-message--error"><%= errorMessage[0] %> </div>
+        <% } %>
+        
         <% if (prods.length > 0) { %>
         <div class="grid">
             <% for (let product of prods) { %>

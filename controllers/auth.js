@@ -66,7 +66,7 @@ exports.postSignUp = asyncMiddleware(async (req, res) => {
   user = new User({ name, email, password, cart: { items: [] } });
 
   /* hash user password */
-  const salt = await bcrypt.genSalt(10);
+  const salt = await bcrypt.genSalt(12);
   user.password = await bcrypt.hash(user.password, salt);
 
   /* save user */
@@ -198,8 +198,10 @@ exports.postReset = asyncMiddleware(async (req, res) => {
       from: 'shopify@businessmail.com',
       subject: 'Password reset',
       html: `
-      <p>Hello ${user.name}</p>, Did your request for a password reset token? if so find the link to reset your password below
-      <p>Click this <a href='https://localhost:5000/pass-reset/${token}'>link</a> to reset your password</p>
+      <p>Hello ${
+        user.name.split(' ')[0]
+      } Did your request for a password reset? if so find the link to reset your password.</p>
+      <p>Click this <a href='http://localhost:5000/new-password/${token}'><strong>link</strong></a> to reset your password.</p>
       `,
     });
 
@@ -207,4 +209,59 @@ exports.postReset = asyncMiddleware(async (req, res) => {
 
     console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
   });
+});
+
+/* Render view for resetting password */
+exports.getNewPassword = asyncMiddleware(async (req, res) => {
+  const { token } = req.params;
+
+  const user = await User.findOne({
+    resetToken: token,
+    resetTokenExpiration: { $gt: Date.now() },
+  });
+
+  let message = req.flash('error');
+  if (message.length > 0) {
+    message = message;
+  } else {
+    message = null;
+  }
+
+  if (user) {
+    res.render('auth/new_password', {
+      path: '/new-password',
+      pageTitle: 'New Password',
+      errorMessage: message,
+      userId: user._id.toString(),
+      passwordToken: token,
+    });
+  }
+});
+
+/* Update password */
+exports.postNewPassword = asyncMiddleware(async (req, res) => {
+  const { password, confirmPassword, userId, passwordToken } = req.body;
+
+  const user = await User.findOne({
+    resetToken: passwordToken,
+    resetTokenExpiration: { $gt: Date.now() },
+    _id: userId,
+  });
+
+  if (!user) {
+    req.flash('error', 'User credential not valid');
+    return res.status(400).redirect('/new-password/:token');
+  }
+
+  if (password !== confirmPassword) {
+    req.flash('error', 'Your password do not match');
+    return res.status(400).redirect('/new-password/:token');
+  }
+
+  const salt = await bcrypt.genSalt(12);
+  user.password = await bcrypt.hash(password, salt);
+  user.resetToken = undefined;
+  user.resetTokenExpiration = undefined;
+  user.save();
+  res.redirect('/login');
 });

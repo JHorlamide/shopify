@@ -8,7 +8,9 @@ const {
   postLogin,
   postLogout,
   getReset,
-  postReset
+  postReset,
+  getNewPassword,
+  postNewPassword,
 } = require('../controllers/auth');
 
 
@@ -60,6 +62,21 @@ router.get('/pass-reset', getReset);
  * @desc    Reset password
  * @access  Public
  * ***/
-router.get('/pass-reset', postReset);
+router.post('/pass-reset', postReset);
+
+/***
+ * @router  GET: /new-password
+ * @desc    Render view for new password
+ * @access  Public
+ * ***/
+router.get('/new-password/:token', getNewPassword);
+
+
+/***
+ * @router  POST: /new-password
+ * @desc    Render view for new password
+ * @access  Public
+ * ***/
+router.post('/new-password', postNewPassword);
 
 module.exports = router;

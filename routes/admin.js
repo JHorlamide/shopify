@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const isAuth = require('../middleware/auth');
 
+
 /* Controllers */
 const {
   getAddProduct,
@@ -10,7 +11,6 @@ const {
   getEditProduct,
   postEditProduct,
   deleteProduct,
-  createUser,
 } = require('../controllers/admin');
 
 /***

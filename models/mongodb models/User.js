@@ -27,6 +27,14 @@ const userSchema = new mongoose.Schema({
     required: true,
   },
 
+  resetToken: {
+    type: String,
+  },
+
+  resetTokenExpiration: {
+    type: Date,
+  },
+
   cart: {
     items: [
       {

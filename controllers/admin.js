@@ -1,7 +1,6 @@
 /* Custom modules */
 const asyncMiddleware = require('../middleware/async');
 const Product = require('../models/mongodb models/Product');
-// const { User } = require('../models/mongodb models/User');
 const mongoose = require('mongoose');
 const objectId = mongoose.Types.ObjectId;
 

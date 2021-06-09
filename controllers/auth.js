@@ -1,6 +1,8 @@
+const crypto = require('crypto');
 const asyncMiddleware = require('../middleware/async');
 const { User, validation } = require('../models/mongodb models/User');
 const bcrypt = require('bcrypt');
+const nodemailer = require('nodemailer');
 const Joi = require('joi');
 
 const inputValidation = (userInput) => {
@@ -12,11 +14,28 @@ const inputValidation = (userInput) => {
   return schema.validate(userInput);
 };
 
+let transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'olamidejubril68@gmail.com',
+    pass: '#JHorlamide21#',
+  },
+});
+
 /* Render view for signing up */
 exports.getSignUp = asyncMiddleware(async (req, res) => {
+  let message = req.flash('error');
+
+  if (message.length > 0) {
+    message = message[0];
+  } else {
+    message = null;
+  }
+
   res.render('auth/signup', {
     path: '/signup',
     pageTitle: 'Signup',
+    errorMessage: message,
   });
 });
 
@@ -26,16 +45,22 @@ exports.postSignUp = asyncMiddleware(async (req, res) => {
 
   const { error } = validation({ name, email, password });
   if (error) {
-    return res.status(400).json({ msg: error.details[0].message });
+    req.flash('error', error.details[0].message);
+    return res.status(400).redirect('/signup');
   }
 
   /* Check if user exist */
   let user = await User.findOne({ email: email });
-  if (user) return res.status(400).json({ msg: 'User already exist' });
+  if (user) {
+    req.flash('error', 'User already exist');
+    return res.status(400).redirect('/signup');
+  }
 
-  /* Validate Password */
-  if (password !== confirmPassword)
-    return res.status(400).json({ msg: 'Invalid credential' });
+  /* Confirm Password Match */
+  if (password !== confirmPassword) {
+    req.flash('error', 'Password do not match');
+    return res.status(400).redirect('/signup');
+  }
 
   /* Create new user if user does not exist */
   user = new User({ name, email, password, cart: { items: [] } });
@@ -46,17 +71,35 @@ exports.postSignUp = asyncMiddleware(async (req, res) => {
 
   /* save user */
   await user.save();
-  token = user.generateAuthToken();
-  console.log(token);
-  res.redirect('/');
+
+  res.redirect('/login');
+
+  // send mail with defined transport object
+  let info = await transporter.sendMail({
+    to: email,
+    from: 'olamide_jubril@outlook',
+    subject: 'Sending email from Node for the very first time',
+    html: '<h1>Hello! it fun sending my first mail with nodemailer</h1>',
+  });
+
+  console.log('Message sent: %s', info.messageId);
+
+  console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
 });
 
 /* Render view for logging in User */
 exports.getLogin = asyncMiddleware(async (req, res) => {
-  console.log(req.session.isLoggedIn);
+  let message = req.flash('error');
+  if (message.length > 0) {
+    message = message;
+  } else {
+    message = null;
+  }
+
   res.render('auth/login', {
     path: '/login',
     pageTitle: 'Login',
+    errorMessage: message,
   });
 });
 
@@ -67,19 +110,22 @@ exports.postLogin = asyncMiddleware(async (req, res) => {
   /* Validate user input */
   const { error } = inputValidation({ email, password });
   if (error) {
-    return res.status(400).json({ msg: error.details[0].message });
+    req.flash('error', error.details[0].message);
+    return res.status(400).redirect('/login');
   }
 
   /* Check if user exist */
   const user = await User.findOne({ email: email });
   if (!user) {
-    return res.status(400).redirect('/auth/login');
+    req.flash('error', 'Invalid email or password');
+    return res.status(400).redirect('/login');
   }
 
   /* Validate password */
   const validatePassword = await bcrypt.compare(password, user.password);
   if (!validatePassword) {
-    return res.status(400).redirect('/auth/login');
+    req.flash('error', 'Invalid email or password');
+    return res.status(400).redirect('/login');
   }
 
   req.session.isLoggedIn = true;
@@ -91,10 +137,6 @@ exports.postLogin = asyncMiddleware(async (req, res) => {
 
     res.redirect('/');
   });
-
-  const token = user.generateAuthToken();
-
-  console.log(token);
 });
 
 /* Logout User */
@@ -105,5 +147,64 @@ exports.postLogout = asyncMiddleware(async (req, res) => {
     }
 
     res.redirect('/');
+  });
+});
+
+/* Render view for  Resetting password */
+exports.getReset = asyncMiddleware(async (req, res) => {
+  let message = req.flash('error');
+  if (message.length > 0) {
+    message = message;
+  } else {
+    message = null;
+  }
+
+  res.render('auth/pass_reset', {
+    path: '/pass_reset',
+    pageTitle: 'Reset Password',
+    errorMessage: message,
+  });
+});
+
+/* Reset Password */
+exports.postReset = asyncMiddleware(async (req, res) => {
+  crypto.randomBytes(32, async (error, buffer) => {
+    if (error) {
+      req.flash('error', 'Error generating buffer');
+      return res.status(400).redirect('/pass-reset');
+    }
+
+    const token = buffer.toString('hex');
+
+    /* Find user with the email address */
+    const user = await User.findOne({ email: req.body.email });
+
+    /* Check if user exist */
+    if (!user) {
+      req.flash('error', 'No user with this email address.');
+      return res.status(400).redirect('/login');
+    }
+
+    /* Store token in the database */
+    user.resetToken = token;
+    user.resetTokenExpiration = Date.now() + 3600000;
+    user.save();
+
+    res.redirect('/');
+
+    // send mail with defined transport object
+    let info = await transporter.sendMail({
+      to: req.body.email,
+      from: 'shopify@businessmail.com',
+      subject: 'Password reset',
+      html: `
+      <p>Hello ${user.name}</p>, Did your request for a password reset token? if so find the link to reset your password below
+      <p>Click this <a href='https://localhost:5000/pass-reset/${token}'>link</a> to reset your password</p>
+      `,
+    });
+
+    console.log('Message sent: %s', info.messageId);
+
+    console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
   });
 });

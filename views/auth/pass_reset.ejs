@@ -13,25 +13,15 @@
     <form class="login-form" action="/login" method="POST">
       <!-- CSRF -->
       <input type="hidden" name='_csrf' value="<%= csrfToken %>">
-      
+
       <!-- Email -->
       <div class="form-control">
         <label for="email">Email</label>
         <input type="email" name="email" id="email">
       </div>
-      
-      <!-- Password -->
-      <div class="form-control">
-        <label for="password">Password</label>
-        <input type="password" name="password" id="password">
-      </div>
-      
-      <!-- Button -->
-      <button class="btn" type="submit">Login</button>
-    </form>
 
-    <div class='centered'>
-      <a href="/pass-reset">Reset Password?</a>
-    </div>
+      <!-- Button -->
+      <button class="btn" type="submit">Reset Password</button>
+    </form>
   </main>
   <%- include('../includes/end.ejs') %>

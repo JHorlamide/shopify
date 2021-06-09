@@ -18,7 +18,7 @@ exports.getProduct = asyncMiddleware(async (req, res) => {
 
   res.render('shop/product-detail', {
     product: product,
-    pageTitle: product.tle,
+    pageTitle: product.title,
     path: '/products',
   });
 });
@@ -64,7 +64,7 @@ exports.postCartDeleteProduct = asyncMiddleware(async (req, res) => {
 
 /* Create new Order */
 exports.postOrder = asyncMiddleware(async (req, res) => {
-  const cartProducts = await req.session.user
+  const cartProducts = await req.user
     .populate('cart.items.productId')
     .execPopulate();
 

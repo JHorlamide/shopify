@@ -15,6 +15,7 @@ const {
   getCheckout,
 } = require('../controllers/shop');
 
+
 /***
  * @router  GET: /
  * @desc    Renders all products
@@ -77,5 +78,6 @@ router.post('/create-order', isAuth, postOrder);
  * @access  Public
  * ***/
 router.get('/checkout', isAuth, getCheckout);
+
 
 module.exports = router;

@@ -3,12 +3,15 @@ const path = require('path');
 const csrf = require('csurf');
 const config = require('config');
 const session = require('express-session');
-const mongodbStore = require('connect-mongodb-session')(session);
+const cookieParser = require('cookie-parser');
+const MongoDBStore = require('connect-mongodb-session')(session);
+const flashErrorMessage = require('connect-flash');
 
 /* Routes */
 const adminRoutes = require('../routes/admin');
 const shopRoutes = require('../routes/shop');
 const authRoute = require('../routes/auth');
+const { User } = require('../models/mongodb models/User');
 
 /* Middlewares */
 const userMiddleware = require('../middleware/userMiddleware');
@@ -18,7 +21,7 @@ const errorController = require('../controllers/error');
 
 const routes = (app) => {
   /* Session store config */
-  const store = new mongodbStore({
+  const store = new MongoDBStore({
     uri: config.get('MONGODB_URI'),
     collection: 'sessions',
   });
@@ -27,26 +30,27 @@ const routes = (app) => {
   app.set('view engine', 'ejs');
   app.set('views', 'views');
 
-  app.use(express.static(path.join(__dirname, '../public')));
+  app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
-
+  app.use(cookieParser());
   app.use(
     session({
       secret: 'secret123',
       resave: false,
       store: store,
       saveUninitialized: false,
-      cookie: {
-        httpOnly: true,
-        maxAge: 360000,
-      },
     })
   );
 
   /* CSRF Protection */
   app.use(csrf());
 
-  /* User middleware */ 
+  /* Register connect-flash */
+  app.use(flashErrorMessage());
+
+  app.use(express.static(path.join(__dirname, '../public')));
+
+  /* User middleware */
   app.use(async (req, res, next) => {
     if (!req.session.user) {
       return next();
@@ -61,7 +65,7 @@ const routes = (app) => {
     }
   });
 
-  /* Local variables */ 
+  /* Local variables */
   app.use((req, res, next) => {
     res.locals.isAuthenticated = req.session.isLoggedIn;
     res.locals.csrfToken = req.csrfToken();
@@ -70,8 +74,8 @@ const routes = (app) => {
 
   /* Routes */
   app.use('/admin', adminRoutes);
-  app.use('/auth', authRoute);
   app.use(shopRoutes);
+  app.use(authRoute);
 
   /* Handles unknown route */
   app.use(errorController.get404);

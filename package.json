@@ -16,6 +16,7 @@
     "bcrypt": "^5.0.1",
     "body-parser": "^1.18.3",
     "config": "^3.3.6",
+    "connect-flash": "^0.1.1",
     "connect-mongodb-session": "^2.4.1",
     "cookie-parser": "^1.4.5",
     "csurf": "^1.11.0",
@@ -28,6 +29,7 @@
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.12.10",
     "mysql2": "^2.2.5",
+    "nodemailer": "^6.6.1",
     "pug": "^2.0.3",
     "sequelize": "^6.6.2"
   }

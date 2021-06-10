@@ -7,8 +7,12 @@ const Joi = require('joi');
 
 const inputValidation = (userInput) => {
   const schema = Joi.object({
-    email: Joi.string().min(5).max(255).required(),
-    password: Joi.string().min(5).max(20).required(),
+    email: Joi.string().email({
+      minDomainSegments: 2,
+      tlds: { allow: ['com', 'net'] },
+    }),
+
+    password: Joi.string().min(7).required().strict(),
   });
 
   return schema.validate(userInput);
@@ -36,6 +40,8 @@ exports.getSignUp = asyncMiddleware(async (req, res) => {
     path: '/signup',
     pageTitle: 'Signup',
     errorMessage: message,
+    validationError: '',
+    oldInput: { name: '', email: '', password: '', confirmPassword: '' },
   });
 });
 
@@ -43,17 +49,29 @@ exports.getSignUp = asyncMiddleware(async (req, res) => {
 exports.postSignUp = asyncMiddleware(async (req, res) => {
   const { name, email, password, confirmPassword } = req.body;
 
-  const { error } = validation({ name, email, password });
+  const { error } = validation({ name, email, password, confirmPassword });
   if (error) {
-    req.flash('error', error.details[0].message);
-    return res.status(400).redirect('/signup');
+    console.log(error.details[0].path[0]);
+    return res.status(422).render('auth/signup', {
+      path: '/signup',
+      pageTitle: 'Signup',
+      errorMessage: error.details[0].message,
+      validationError: error.details[0].path[0],
+      oldInput: { name, email, password, confirmPassword },
+    });
   }
 
   /* Check if user exist */
   let user = await User.findOne({ email: email });
   if (user) {
-    req.flash('error', 'User already exist');
-    return res.status(400).redirect('/signup');
+    return res.status(422).render('auth/signup', {
+      path: '/signup',
+      pageTitle: 'Signup',
+      errorMessage: 'User already exists',
+      oldInput: { name, email, password, confirmPassword },
+    });
+
+    // req.flash('error', 'User already exist');
   }
 
   /* Confirm Password Match */
@@ -100,6 +118,7 @@ exports.getLogin = asyncMiddleware(async (req, res) => {
     path: '/login',
     pageTitle: 'Login',
     errorMessage: message,
+    oldInput: { email: '', password: '' },
   });
 });
 
@@ -110,22 +129,41 @@ exports.postLogin = asyncMiddleware(async (req, res) => {
   /* Validate user input */
   const { error } = inputValidation({ email, password });
   if (error) {
-    req.flash('error', error.details[0].message);
-    return res.status(400).redirect('/login');
+    // req.flash('error', error.details[0].message);
+    return res.status(422).render('auth/login', {
+      path: '/login',
+      pageTitle: 'Login',
+      errorMessage: error.details[0].message,
+      oldInput: { email, password },
+    });
   }
 
   /* Check if user exist */
   const user = await User.findOne({ email: email });
   if (!user) {
-    req.flash('error', 'Invalid email or password');
-    return res.status(400).redirect('/login');
+    return res.status(422).render('auth/login', {
+      path: '/login',
+      pageTitle: 'Login',
+      errorMessage: 'Invalid email or password',
+      oldInput: { email, password },
+    });
+
+    // req.flash('error', 'Invalid email or password');
+    // return res.status(400).redirect('/login');
   }
 
   /* Validate password */
   const validatePassword = await bcrypt.compare(password, user.password);
   if (!validatePassword) {
-    req.flash('error', 'Invalid email or password');
-    return res.status(400).redirect('/login');
+    return res.status(422).render('auth/login', {
+      path: '/login',
+      pageTitle: 'Login',
+      errorMessage: 'Invalid email or password',
+      oldInput: { email, password },
+    });
+
+    // req.flash('error', 'Invalid email or password');
+    // return res.status(400).redirect('/login');
   }
 
   req.session.isLoggedIn = true;

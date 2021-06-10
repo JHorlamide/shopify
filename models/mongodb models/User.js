@@ -15,7 +15,6 @@ const userSchema = new mongoose.Schema({
     type: String,
     minLength: 5,
     maxLength: 255,
-    match: /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/,
     unique: true,
     required: true,
   },
@@ -111,21 +110,15 @@ userSchema.methods.generateAuthToken = function () {
 };
 
 /* User validation */
-exports.validateInput = (userInput) => {
-  const schema = Joi.object({
-    name: Joi.string().min(5).max(255).required(),
-    email: Joi.string().min(5).max(255).required(),
-    password: Joi.string().min(5).max(20).required(),
-  });
-
-  return schema.validate(userInput);
-};
-
 const validation = (userInput) => {
   const schema = Joi.object({
     name: Joi.string().min(5).max(255).required(),
-    email: Joi.string().min(5).max(255).required(),
-    password: Joi.string().min(5).max(20).required(),
+    email: Joi.string().email({
+      minDomainSegments: 2,
+      tlds: { allow: ['com', 'net'] },
+    }),
+    password: Joi.string().min(7).required().strict(),
+    confirmPassword: Joi.ref('password'),
   });
 
   return schema.validate(userInput);

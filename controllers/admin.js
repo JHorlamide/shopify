@@ -103,8 +103,15 @@ exports.postEditProduct = asyncMiddleware(async (req, res) => {
 exports.deleteProduct = asyncMiddleware(async (req, res) => {
   const product = await Product.findById(req.body.productId);
 
+  /* Check if product exists */
   if (!product) return res.status(400).json({ msg: 'Product not found' });
 
-  await Product.findByIdAndRemove(req.body.productId);
+  /* Check if product belongs to user*/
+  if (product.userId !== req.user._id) {
+    req.flash('error', 'Your are not authorized to delete the product.');
+    return res.status(401).redirect('/admin/products');
+  }
+
+  await Product.deleteOne({ _id: req.body.productId, userId: req.user._id });
   res.redirect('/admin/products');
 });

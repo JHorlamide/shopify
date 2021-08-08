@@ -18,7 +18,7 @@
       <div class="form-control">
         <label for="name">Full Name</label>
         <input
-          class='<% validationError === 'name' ? 'invalid' : '' %>'
+          class='<%= validationError === 'name' ? 'invalid' : '' %>'
           type="text" 
           name="name" 
           id="name" 
@@ -29,8 +29,7 @@
       <div class="form-control">
         <label for="email">Email</label>
         <input
-          class='<% validationError === 'email' ? 'invalid' : '' %>'
-          
+          class='<%= validationError === 'email' ? 'invalid' : '' %>'
           name="email" 
           id="email" 
           value="<%= oldInput.email %>">
@@ -40,7 +39,7 @@
       <div class="form-control">
         <label for="password">Password</label>
         <input
-          class='<% validationError === 'password' ? 'invalid' : '' %>'
+          class='<%= validationError === 'password' ? 'invalid' : '' %>'
           type="password" 
           name="password" 
           id="password" 
@@ -51,6 +50,7 @@
       <div class="form-control">
         <label for="confirmPassword">Confirm Password</label>
         <input
+          class='<%= validationError === 'confirmPassword' ? 'invalid' : '' %>'
           type="password" 
           name="confirmPassword" 
           id="confirmPassword" 

@@ -1,5 +1,5 @@
 const asyncMiddleware = require('../middleware/async');
-const Product = require('../models/mongodb models/Product');
+const { Product } = require('../models/mongodb models/Product');
 const Order = require('../models/mongodb models/Order');
 
 exports.getProducts = asyncMiddleware(async (req, res) => {

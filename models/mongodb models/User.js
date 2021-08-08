@@ -8,6 +8,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     minLength: 5,
     maxLength: 255,
+    trim: true,
     required: true,
   },
 
@@ -16,6 +17,7 @@ const userSchema = new mongoose.Schema({
     minLength: 5,
     maxLength: 255,
     unique: true,
+    trim: true,
     required: true,
   },
 
@@ -23,6 +25,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     minLength: 5,
     maxLength: 255,
+    trim: true,
     required: true,
   },
 
@@ -102,7 +105,8 @@ userSchema.methods.generateAuthToken = function () {
     id: this.id,
   };
 
-  const token = jwt.sign(payload, config.get('JwtPrivateKey'), {
+  const token = jwt.sign(payload, process.env.JWT_PRIVATE_KYE), {
+  // const token = jwt.sign(payload, config.get('JwtPrivateKey'), {
     expiresIn: 3600,
   });
 
@@ -113,7 +117,7 @@ userSchema.methods.generateAuthToken = function () {
 const validation = (userInput) => {
   const schema = Joi.object({
     name: Joi.string().min(5).max(255).required(),
-    email: Joi.string().email({
+    email: Joi.string().lowercase('lower').email({
       minDomainSegments: 2,
       tlds: { allow: ['com', 'net'] },
     }),

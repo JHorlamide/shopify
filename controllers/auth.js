@@ -51,7 +51,6 @@ exports.postSignUp = asyncMiddleware(async (req, res) => {
 
   const { error } = validation({ name, email, password, confirmPassword });
   if (error) {
-    console.log(error.details[0].path[0]);
     return res.status(422).render('auth/signup', {
       path: '/signup',
       pageTitle: 'Signup',
@@ -118,6 +117,7 @@ exports.getLogin = asyncMiddleware(async (req, res) => {
     path: '/login',
     pageTitle: 'Login',
     errorMessage: message,
+    validationError: '',
     oldInput: { email: '', password: '' },
   });
 });
@@ -129,11 +129,11 @@ exports.postLogin = asyncMiddleware(async (req, res) => {
   /* Validate user input */
   const { error } = inputValidation({ email, password });
   if (error) {
-    // req.flash('error', error.details[0].message);
     return res.status(422).render('auth/login', {
       path: '/login',
       pageTitle: 'Login',
       errorMessage: error.details[0].message,
+      validationError: error.details[0].path[0],
       oldInput: { email, password },
     });
   }
@@ -145,11 +145,9 @@ exports.postLogin = asyncMiddleware(async (req, res) => {
       path: '/login',
       pageTitle: 'Login',
       errorMessage: 'Invalid email or password',
+      validationError: '',
       oldInput: { email, password },
     });
-
-    // req.flash('error', 'Invalid email or password');
-    // return res.status(400).redirect('/login');
   }
 
   /* Validate password */
@@ -159,11 +157,9 @@ exports.postLogin = asyncMiddleware(async (req, res) => {
       path: '/login',
       pageTitle: 'Login',
       errorMessage: 'Invalid email or password',
+      validationError: '',
       oldInput: { email, password },
     });
-
-    // req.flash('error', 'Invalid email or password');
-    // return res.status(400).redirect('/login');
   }
 
   req.session.isLoggedIn = true;

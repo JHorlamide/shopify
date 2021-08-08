@@ -1,6 +1,6 @@
 /* Custom modules */
 const asyncMiddleware = require('../middleware/async');
-const Product = require('../models/mongodb models/Product');
+const { Product, validation } = require('../models/mongodb models/Product');
 const mongoose = require('mongoose');
 const objectId = mongoose.Types.ObjectId;
 
@@ -9,12 +9,28 @@ exports.getAddProduct = asyncMiddleware(async (req, res) => {
   res.render('admin/add-product', {
     pageTitle: 'Add Product',
     path: '/admin/add-product',
+    editing: false,
+    validationError: null,
+    errorMessage: null,
+    oldInput: { title: '', imageUrl: '', price: '', description: '' },
   });
 });
 
-/* Save/persist product */
+/* Save product */
 exports.postAddProduct = asyncMiddleware(async (req, res) => {
   const { title, imageUrl, price, description } = req.body;
+
+  const { error } = validation({ title, imageUrl, price, description });
+  if (error) {
+    return res.status(422).render('admin/add-product', {
+      pageTitle: 'Add Product',
+      path: '/admin/add-product',
+      editing: false,
+      errorMessage: error.details[0].message,
+      validationError: error.details[0].path[0],
+      oldInput: { title, imageUrl, price, description },
+    });
+  }
 
   const product = new Product({
     title,
@@ -40,11 +56,10 @@ exports.getProducts = asyncMiddleware(async (req, res) => {
 
   const products = await Product.find({ userId: req.user._id });
 
-  res.render('admin/products', {
+  return res.render('admin/products', {
     prods: products,
     pageTitle: 'Admin Products',
     path: '/admin/products',
-    editing: false,
     errorMessage: message,
   });
 });
@@ -54,21 +69,42 @@ exports.getEditProduct = asyncMiddleware(async (req, res) => {
   const editMode = req.query.edit;
   if (!editMode) return res.redirect('/admin');
 
-  /* Find product by primary key */
+  console.log('Product Id - 1 (Render view)', req.params.productId);
+
+  /* Find product */
   const product = await Product.findById(req.params.productId);
+
+  console.log('Product Id - 2 (Render view)', req.params.productId);
 
   res.render('admin/edit-product', {
     pageTitle: 'Edit Product',
     path: 'admin/edit-product',
     editing: editMode,
+    hasError: false,
     product: product,
+    errorMessage: null,
+    validationError: null,
   });
 });
 
 /* Update existing product */
 exports.postEditProduct = asyncMiddleware(async (req, res) => {
-  const { title, imageUrl, price, description } = req.body;
-  const { productId } = req.body;
+  const { title, imageUrl, price, description, productId } = req.body;
+
+  console.log('Product Id - 1 (Post)', productId);
+
+  const { error } = validation({ title, imageUrl, price, description });
+  if (error) {
+    return res.status(422).render('admin/edit-product', {
+      pageTitle: 'Edit Product',
+      path: '/admin/add-product',
+      editing: true,
+      hasError: true,
+      validationError: error.details[0].path[0],
+      errorMessage: error.details[0].message,
+      product: { title, imageUrl, price, description, productId },
+    });
+  }
 
   const productObject = {};
   if (title) productObject.title = title;
@@ -76,7 +112,9 @@ exports.postEditProduct = asyncMiddleware(async (req, res) => {
   if (price) productObject.price = price;
   if (description) productObject.description = description;
 
-  let product = await Product.findById(objectId(productId));
+  console.log('Product Id - 2 (Post)', productId);
+
+  let product = await Product.findById(productId);
 
   /* Check if product exist */
   if (!product) {

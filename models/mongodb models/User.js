@@ -105,8 +105,7 @@ userSchema.methods.generateAuthToken = function () {
     id: this.id,
   };
 
-  const token = jwt.sign(payload, process.env.JWT_PRIVATE_KYE), {
-  // const token = jwt.sign(payload, config.get('JwtPrivateKey'), {
+  const token = jwt.sign(payload, process.env.JWT_PRIVATE_KEY, {
     expiresIn: 3600,
   });
 

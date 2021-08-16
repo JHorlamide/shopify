@@ -1,7 +1,6 @@
 const express = require('express');
 const path = require('path');
 const csrf = require('csurf');
-const config = require('config');
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
 const MongoDBStore = require('connect-mongodb-session')(session);
@@ -22,7 +21,7 @@ const errorController = require('../controllers/error');
 const routes = (app) => {
   /* Session store config */
   const store = new MongoDBStore({
-    uri: config.get('MONGODB_URI'),
+    uri: process.env.MONGO_URI,
     collection: 'sessions',
   });
 

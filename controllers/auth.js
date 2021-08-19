@@ -18,11 +18,12 @@ const inputValidation = (userInput) => {
   return schema.validate(userInput);
 };
 
+/* Mail Transport */
 let transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: 'olamidejubril68@gmail.com',
-    pass: '#JHorlamide21#',
+    user: `${process.env.MAIL_TRANSPORT}`,
+    pass: `${process.env.MAIL_PASSWORD}`,
   },
 });
 
@@ -232,15 +233,13 @@ exports.postReset = asyncMiddleware(async (req, res) => {
       from: 'shopify@businessmail.com',
       subject: 'Password reset',
       html: `
-      <p>Hello ${
-        user.name.split(' ')[0]
-      } Did your request for a password reset? if so find the link to reset your password.</p>
+      <p>Hello ${user.name.split(' ')[0]
+        } Did your request for a password reset? if so find the link to reset your password.</p>
       <p>Click this <a href='http://localhost:5000/new-password/${token}'><strong>link</strong></a> to reset your password.</p>
       `,
     });
 
     console.log('Message sent: %s', info.messageId);
-
     console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
   });
 });

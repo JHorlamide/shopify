@@ -22,7 +22,7 @@ const inputValidation = (userInput) => {
 let transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: `${process.env.MAIL_TRANSPORT}`,
+    user: `${process.env.EMAIL_MAIL}`,
     pass: `${process.env.MAIL_PASSWORD}`,
   },
 });
@@ -235,7 +235,7 @@ exports.postReset = asyncMiddleware(async (req, res) => {
       html: `
       <p>Hello ${user.name.split(' ')[0]
         } Did your request for a password reset? if so find the link to reset your password.</p>
-      <p>Click this <a href='http://localhost:5000/new-password/${token}'><strong>link</strong></a> to reset your password.</p>
+      <p>Click this <a href='http://localhost:8000/new-password/${token}'><strong>link</strong></a> to reset your password.</p>
       `,
     });
 

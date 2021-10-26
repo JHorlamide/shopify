@@ -1,4 +1,3 @@
-/* Custom modules */
 const asyncMiddleware = require('../middleware/async');
 const { Product, validation } = require('../models/mongodb models/Product');
 const mongoose = require('mongoose');

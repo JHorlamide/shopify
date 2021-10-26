@@ -1,38 +1,37 @@
 {
-  "name": "nodejs-complete-guide",
-  "version": "1.0.0",
-  "description": "Complete Node.js Guide",
-  "main": "app.js",
-  "scripts": {
-    "start": "node app.js",
-    "dev": "nodemon app.js",
-    "start-server": "node app.js"
-  },
-  "author": "JHorlamide",
-  "license": "ISC",
-  "devDependencies": {
-    "nodemon": "^1.18.3"
-  },
-  "dependencies": {
-    "bcrypt": "^5.0.1",
-    "body-parser": "^1.18.3",
-    "config": "^3.3.6",
-    "connect-flash": "^0.1.1",
-    "connect-mongodb-session": "^2.4.1",
-    "cookie-parser": "^1.4.5",
-    "csurf": "^1.11.0",
-    "debug": "^2.6.9",
-    "dotenv": "^10.0.0",
-    "ejs": "^2.6.1",
-    "express": "^4.16.3",
-    "express-handlebars": "^3.0.0",
-    "express-session": "^1.17.2",
-    "joi": "^17.4.0",
-    "jsonwebtoken": "^8.5.1",
-    "mongoose": "^5.12.10",
-    "mysql2": "^2.2.5",
-    "nodemailer": "^6.6.1",
-    "pug": "^2.0.3",
-    "sequelize": "^6.6.2"
-  }
+	"name": "nodejs-complete-guide",
+	"version": "1.0.0",
+	"description": "Complete Node.js Guide",
+	"main": "app.js",
+	"scripts": {
+		"start": "node app.js",
+		"dev": "nodemon app.js"
+	},
+	"author": "JHorlamide",
+	"license": "ISC",
+	"devDependencies": {
+		"nodemon": "^1.18.3"
+	},
+	"dependencies": {
+		"bcrypt": "^5.0.1",
+		"body-parser": "^1.18.3",
+		"config": "^3.3.6",
+		"connect-flash": "^0.1.1",
+		"connect-mongodb-session": "^2.4.1",
+		"cookie-parser": "^1.4.5",
+		"csurf": "^1.11.0",
+		"debug": "^2.6.9",
+		"dotenv": "^10.0.0",
+		"ejs": "^2.6.1",
+		"express": "^4.16.3",
+		"express-handlebars": "^3.0.0",
+		"express-session": "^1.17.2",
+		"joi": "^17.4.0",
+		"jsonwebtoken": "^8.5.1",
+		"mongoose": "^5.12.10",
+		"mysql2": "^2.2.5",
+		"nodemailer": "^6.6.1",
+		"pug": "^2.0.3",
+		"sequelize": "^6.6.2"
+	}
 }

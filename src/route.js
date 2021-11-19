@@ -12,7 +12,7 @@ const shopRoutes = require('../routes/shop');
 const authRoute = require('../routes/auth');
 const { User } = require('../models/mongodb models/User');
 
-/* Middlewares */
+/* Middleware */
 const userMiddleware = require('../middleware/userMiddleware');
 
 /* Error handling controller */

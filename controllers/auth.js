@@ -1,15 +1,17 @@
-const crypto = require('crypto');
-const asyncMiddleware = require('../middleware/async');
-const { User, validation } = require('../models/mongodb models/User');
-const bcrypt = require('bcrypt');
-const nodemailer = require('nodemailer');
-const Joi = require('joi');
+const crypto = require("crypto");
+const asyncMiddleware = require("../middleware/async");
+const { User, validation } = require("../models/mongodb models/User");
+const bcrypt = require("bcrypt");
+const nodemailer = require("nodemailer");
+const Joi = require("joi");
+// const { transporter } = require("../src/utiles");
 
+/* Validate user input */
 const inputValidation = (userInput) => {
   const schema = Joi.object({
     email: Joi.string().email({
       minDomainSegments: 2,
-      tlds: { allow: ['com', 'net'] },
+      tlds: { allow: ["com", "net"] },
     }),
 
     password: Joi.string().min(7).required().strict(),
@@ -20,7 +22,7 @@ const inputValidation = (userInput) => {
 
 /* Mail Transport */
 let transporter = nodemailer.createTransport({
-  service: 'gmail',
+  service: "gmail",
   auth: {
     user: `${process.env.MAIL_TRANSPORT}`,
     pass: `${process.env.MAIL_PASSWORD}`,
@@ -29,7 +31,7 @@ let transporter = nodemailer.createTransport({
 
 /* Render view for signing up */
 exports.getSignUp = asyncMiddleware(async (req, res) => {
-  let message = req.flash('error');
+  let message = req.flash("error");
 
   if (message.length > 0) {
     message = message[0];
@@ -37,12 +39,12 @@ exports.getSignUp = asyncMiddleware(async (req, res) => {
     message = null;
   }
 
-  res.render('auth/signup', {
-    path: '/signup',
-    pageTitle: 'Signup',
+  res.render("auth/signup", {
+    path: "/signup",
+    pageTitle: "Signup",
     errorMessage: message,
-    validationError: '',
-    oldInput: { name: '', email: '', password: '', confirmPassword: '' },
+    validationError: "",
+    oldInput: { name: "", email: "", password: "", confirmPassword: "" },
   });
 });
 
@@ -51,10 +53,11 @@ exports.postSignUp = asyncMiddleware(async (req, res) => {
   const { name, email, password, confirmPassword } = req.body;
 
   const { error } = validation({ name, email, password, confirmPassword });
+
   if (error) {
-    return res.status(422).render('auth/signup', {
-      path: '/signup',
-      pageTitle: 'Signup',
+    return res.status(422).render("auth/signup", {
+      path: "/signup",
+      pageTitle: "Signup",
       errorMessage: error.details[0].message,
       validationError: error.details[0].path[0],
       oldInput: { name, email, password, confirmPassword },
@@ -63,11 +66,12 @@ exports.postSignUp = asyncMiddleware(async (req, res) => {
 
   /* Check if user exist */
   let user = await User.findOne({ email: email });
-  if (user) {
-    return res.status(422).render('auth/signup', {
-      path: '/signup',
-      pageTitle: 'Signup',
-      errorMessage: 'User already exists',
+
+  if (!user) {
+    return res.status(422).render("auth/signup", {
+      path: "/signup",
+      pageTitle: "Signup",
+      errorMessage: "User already exists",
       oldInput: { name, email, password, confirmPassword },
     });
 
@@ -76,8 +80,8 @@ exports.postSignUp = asyncMiddleware(async (req, res) => {
 
   /* Confirm Password Match */
   if (password !== confirmPassword) {
-    req.flash('error', 'Password do not match');
-    return res.status(400).redirect('/signup');
+    req.flash("error", "Password do not match");
+    return res.status(400).redirect("/signup");
   }
 
   /* Create new user if user does not exist */
@@ -90,36 +94,36 @@ exports.postSignUp = asyncMiddleware(async (req, res) => {
   /* save user */
   await user.save();
 
-  res.redirect('/login');
+  res.redirect("/login");
 
   // send mail with defined transport object
   let info = await transporter.sendMail({
     to: email,
-    from: 'olamide_jubril@outlook',
-    subject: 'Sending email from Node for the very first time',
-    html: '<h1>Hello! it fun sending my first mail with nodemailer</h1>',
+    from: "olamide_jubril@outlook",
+    subject: "Sending email from Node for the very first time",
+    html: "<h1>Hello! it fun sending my first mail with nodemailer</h1>",
   });
 
-  console.log('Message sent: %s', info.messageId);
+  console.log("Message sent: %s", info.messageId);
 
-  console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
+  console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
 });
 
 /* Render view for logging in User */
 exports.getLogin = asyncMiddleware(async (req, res) => {
-  let message = req.flash('error');
+  let message = req.flash("error");
   if (message.length > 0) {
     message = message;
   } else {
     message = null;
   }
 
-  res.render('auth/login', {
-    path: '/login',
-    pageTitle: 'Login',
+  res.render("auth/login", {
+    path: "/login",
+    pageTitle: "Login",
     errorMessage: message,
-    validationError: '',
-    oldInput: { email: '', password: '' },
+    validationError: "",
+    oldInput: { email: "", password: "" },
   });
 });
 
@@ -129,10 +133,11 @@ exports.postLogin = asyncMiddleware(async (req, res) => {
 
   /* Validate user input */
   const { error } = inputValidation({ email, password });
+  
   if (error) {
-    return res.status(422).render('auth/login', {
-      path: '/login',
-      pageTitle: 'Login',
+    return res.status(422).render("auth/login", {
+      path: "/login",
+      pageTitle: "Login",
       errorMessage: error.details[0].message,
       validationError: error.details[0].path[0],
       oldInput: { email, password },
@@ -141,12 +146,13 @@ exports.postLogin = asyncMiddleware(async (req, res) => {
 
   /* Check if user exist */
   const user = await User.findOne({ email: email });
+  
   if (!user) {
-    return res.status(422).render('auth/login', {
-      path: '/login',
-      pageTitle: 'Login',
-      errorMessage: 'Invalid email or password',
-      validationError: '',
+    return res.status(422).render("auth/login", {
+      path: "/login",
+      pageTitle: "Login",
+      errorMessage: "Invalid email or password",
+      validationError: "",
       oldInput: { email, password },
     });
   }
@@ -154,11 +160,11 @@ exports.postLogin = asyncMiddleware(async (req, res) => {
   /* Validate password */
   const validatePassword = await bcrypt.compare(password, user.password);
   if (!validatePassword) {
-    return res.status(422).render('auth/login', {
-      path: '/login',
-      pageTitle: 'Login',
-      errorMessage: 'Invalid email or password',
-      validationError: '',
+    return res.status(422).render("auth/login", {
+      path: "/login",
+      pageTitle: "Login",
+      errorMessage: "Invalid email or password",
+      validationError: "",
       oldInput: { email, password },
     });
   }
@@ -170,7 +176,7 @@ exports.postLogin = asyncMiddleware(async (req, res) => {
       return console.log(err);
     }
 
-    res.redirect('/');
+    res.redirect("/");
   });
 });
 
@@ -181,22 +187,22 @@ exports.postLogout = asyncMiddleware(async (req, res) => {
       return console.log(err);
     }
 
-    res.redirect('/');
+    res.redirect("/");
   });
 });
 
 /* Render view for  Resetting password */
 exports.getReset = asyncMiddleware(async (req, res) => {
-  let message = req.flash('error');
+  let message = req.flash("error");
   if (message.length > 0) {
     message = message;
   } else {
     message = null;
   }
 
-  res.render('auth/pass_reset', {
-    path: '/pass_reset',
-    pageTitle: 'Reset Password',
+  res.render("auth/pass_reset", {
+    path: "/pass_reset",
+    pageTitle: "Reset Password",
     errorMessage: message,
   });
 });
@@ -205,19 +211,19 @@ exports.getReset = asyncMiddleware(async (req, res) => {
 exports.postReset = asyncMiddleware(async (req, res) => {
   crypto.randomBytes(32, async (error, buffer) => {
     if (error) {
-      req.flash('error', 'Error generating buffer');
-      return res.status(400).redirect('/pass-reset');
+      req.flash("error", "Error generating buffer");
+      return res.status(400).redirect("/pass-reset");
     }
 
-    const token = buffer.toString('hex');
+    const token = buffer.toString("hex");
 
     /* Find user with the email address */
     const user = await User.findOne({ email: req.body.email });
 
     /* Check if user exist */
     if (!user) {
-      req.flash('error', 'No user with this email address.');
-      return res.status(400).redirect('/login');
+      req.flash("error", "No user with this email address.");
+      return res.status(400).redirect("/login");
     }
 
     /* Store token in the database */
@@ -225,22 +231,23 @@ exports.postReset = asyncMiddleware(async (req, res) => {
     user.resetTokenExpiration = Date.now() + 3600000;
     user.save();
 
-    res.redirect('/');
+    res.redirect("/");
 
     // send mail with defined transport object
     let info = await transporter.sendMail({
       to: req.body.email,
-      from: 'shopify@businessmail.com',
-      subject: 'Password reset',
+      from: "shopify@businessmail.com",
+      subject: "Password reset",
       html: `
-      <p>Hello ${user.name.split(' ')[0]
-        } Did your request for a password reset? if so find the link to reset your password.</p>
+      <p>Hello ${
+        user.name.split(" ")[0]
+      } Did your request for a password reset? if so find the link to reset your password.</p>
       <p>Click this <a href='http://localhost:5000/new-password/${token}'><strong>link</strong></a> to reset your password.</p>
       `,
     });
 
-    console.log('Message sent: %s', info.messageId);
-    console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
+    console.log("Message sent: %s", info.messageId);
+    console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
   });
 });
 
@@ -253,7 +260,7 @@ exports.getNewPassword = asyncMiddleware(async (req, res) => {
     resetTokenExpiration: { $gt: Date.now() },
   });
 
-  let message = req.flash('error');
+  let message = req.flash("error");
   if (message.length > 0) {
     message = message;
   } else {
@@ -261,9 +268,9 @@ exports.getNewPassword = asyncMiddleware(async (req, res) => {
   }
 
   if (user) {
-    res.render('auth/new_password', {
-      path: '/new-password',
-      pageTitle: 'New Password',
+    res.render("auth/new_password", {
+      path: "/new-password",
+      pageTitle: "New Password",
       errorMessage: message,
       userId: user._id.toString(),
       passwordToken: token,
@@ -282,13 +289,13 @@ exports.postNewPassword = asyncMiddleware(async (req, res) => {
   });
 
   if (!user) {
-    req.flash('error', 'User credential not valid');
-    return res.status(400).redirect('/new-password/:token');
+    req.flash("error", "User credential not valid");
+    return res.status(400).redirect("/new-password/:token");
   }
 
   if (password !== confirmPassword) {
-    req.flash('error', 'Your password do not match');
-    return res.status(400).redirect('/new-password/:token');
+    req.flash("error", "Your password do not match");
+    return res.status(400).redirect("/new-password/:token");
   }
 
   const salt = await bcrypt.genSalt(12);
@@ -296,5 +303,5 @@ exports.postNewPassword = asyncMiddleware(async (req, res) => {
   user.resetToken = undefined;
   user.resetTokenExpiration = undefined;
   user.save();
-  res.redirect('/login');
+  res.redirect("/login");
 });

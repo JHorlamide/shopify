@@ -1,22 +1,21 @@
-const Sequelize = require('sequelize');
-const debug = require('debug');
+const Sequelize = require("sequelize");
+const debug = require("debug");
 
-const dbConnectionTest = debug('Database:connected');
+const dbConnectionTest = debug("Database:connected");
 
-const sequelize = new Sequelize('node-complete', 'root', '', {
-	dialect: 'mysql',
-	host: 'localhost',
+const sequelize = new Sequelize("node-complete", "root", "", {
+  dialect: "mysql",
+  host: "localhost",
 });
 
 try {
-	sequelize.authenticate();
-	dbConnectionTest('Database connected successfully');
+  sequelize.authenticate();
+  dbConnectionTest("Database connected successfully");
 } catch (error) {
-	console.log('Unable to connect to database: ' + error.message);
+  console.log("Unable to connect to database: " + error.message);
 }
 
 module.exports = sequelize;
-
 
 // const Sequel = async () => {
 //   try {
@@ -63,4 +62,3 @@ module.exports = sequelize;
 //   .catch((error) => {
 //     console.log(error);
 //   });
-

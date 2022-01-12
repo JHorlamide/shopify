@@ -48,6 +48,7 @@ router.post("/login", postLogin);
  * ***/
 router.post("/logout", postLogout);
 
+
 /***
  * @router  GET: /pass-reset
  * @desc    Render view for password reset
@@ -71,7 +72,7 @@ router.get("/new-password/:token", getNewPassword);
 
 /***
  * @router  POST: /new-password
- * @desc    Render view for new password
+ * @desc    Update password
  * @access  Public
  * ***/
 router.post("/new-password", postNewPassword);

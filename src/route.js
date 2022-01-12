@@ -50,19 +50,7 @@ const routes = (app) => {
   app.use(express.static(path.join(__dirname, '../public')));
 
   /* User middleware */
-  app.use(async (req, res, next) => {
-    if (!req.session.user) {
-      return next();
-    }
-
-    try {
-      const user = await User.findById(req.session.user._id);
-      req.user = user;
-      next();
-    } catch (error) {
-      console.log(error);
-    }
-  });
+  app.use(userMiddleware);
 
   /* Local variables */
   app.use((req, res, next) => {

@@ -74,8 +74,6 @@ exports.postSignUp = asyncMiddleware(async (req, res) => {
       errorMessage: "User already exists",
       oldInput: { name, email, password, confirmPassword },
     });
-
-    // req.flash('error', 'User already exist');
   }
 
   /* Confirm Password Match */
@@ -190,6 +188,7 @@ exports.postLogout = asyncMiddleware(async (req, res) => {
     res.redirect("/");
   });
 });
+
 
 /* Render view for  Resetting password */
 exports.getReset = asyncMiddleware(async (req, res) => {
